@@ -80,7 +80,6 @@ export function AddOfferForm() {
       await addDoc(collection(db, 'offers'), {
         hotelId: user.uid,
         hotelName: user.displayName || '',
-        hotelPhone: user.phoneNumber,
         menuItemId: formData.itemId,
         name: selectedItem.name,
         description: formData.description,

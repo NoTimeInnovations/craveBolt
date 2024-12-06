@@ -5,23 +5,18 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { FoodOffer } from '@/lib/types';
 import { FoodOfferCard } from '@/components/customer/FoodOfferCard';
-import { useGeolocation } from '@/hooks/useGeolocation';
 import { requestNotificationPermission, showNotification } from '@/lib/notifications';
-import { getDistanceFromLatLonInKm } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export function CustomerDashboard() {
   const [offers, setOffers] = useState<FoodOffer[]>([]);
   const [loading, setLoading] = useState(true);
-  const { latitude, longitude, error: locationError } = useGeolocation();
 
   useEffect(() => {
     requestNotificationPermission();
   }, []);
 
   useEffect(() => {
-    if (!latitude || !longitude) return;
-
     const now = new Date();
     const q = query(
       collection(db, 'offers'),
@@ -42,27 +37,19 @@ export function CustomerDashboard() {
       });
 
       snapshot.forEach((doc) => {
-        const data = doc.data();
-        const hotelDistance = getDistanceFromLatLonInKm(
-          latitude,
-          longitude,
-          data.hotelLatitude,
-          data.hotelLongitude
-        );
-        
         offerData.push({
           id: doc.id,
-          ...data,
-          hotelDistance: Math.round(hotelDistance * 10) / 10
+          ...doc.data(),
+          hotelDistance: 0 // Temporary fix until location is implemented
         } as FoodOffer);
       });
 
-      setOffers(offerData.sort((a, b) => a.hotelDistance - b.hotelDistance));
+      setOffers(offerData);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [latitude, longitude]);
+  }, []);
 
   if (loading) {
     return (
@@ -72,25 +59,20 @@ export function CustomerDashboard() {
     );
   }
 
-  if (locationError) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="rounded-lg bg-red-50 p-4 text-red-800">
-          <p>Error: {locationError}</p>
-          <p className="mt-2">Please enable location services to see nearby offers.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-6">
       <h2 className="mb-6 text-2xl font-bold">Available Offers</h2>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {offers.map((offer) => (
-          <FoodOfferCard key={offer.id} offer={offer} />
-        ))}
-      </div>
+      {offers.length === 0 ? (
+        <div className="rounded-lg bg-gray-50 p-8 text-center dark:bg-gray-800">
+          <p className="text-lg text-muted-foreground">No offers available at the moment.</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {offers.map((offer) => (
+            <FoodOfferCard key={offer.id} offer={offer} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
