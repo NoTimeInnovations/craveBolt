@@ -37,11 +37,6 @@ export function CustomerDashboard() {
     fetchOffers();
   }, []);
 
-  const handleOrder = (offerId: string) => {
-    // Implement order functionality
-    console.log('Ordering:', offerId);
-  };
-
   if (loading) {
     return <div>Loading offers...</div>;
   }
@@ -54,7 +49,6 @@ export function CustomerDashboard() {
           <FoodOfferCard
             key={offer.id}
             offer={offer}
-            onOrder={handleOrder}
           />
         ))}
       </div>

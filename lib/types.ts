@@ -23,8 +23,12 @@ export interface Hotel {
 export interface FoodOffer {
   id: string;
   hotelId: string;
+  hotelName: string;
+  hotelPhone?: string;
   name: string;
+  description?: string;
   price: number;
+  originalPrice?: number;
   imageUrl: string;
   hotelDistance: number;
   validTill: Date;
