@@ -19,9 +19,7 @@ export function CustomerDashboard() {
   useEffect(() => {
     const now = new Date();
     const q = query(
-      collection(db, 'offers'),
-      where('validTill', '>', now),
-      orderBy('validTill', 'asc')
+      collection(db, 'offers')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
