@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, Store, Menu } from 'lucide-react';
+import { Users, Store } from 'lucide-react';
+import { UserList } from '@/components/admin/UserList';
+import { HotelList } from '@/components/admin/HotelList';
 
 export function AdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'users' | 'hotels' | 'menus'>('users');
+  const [activeSection, setActiveSection] = useState<'users' | 'hotels'>('users');
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
@@ -27,14 +29,6 @@ export function AdminDashboard() {
             <Store className="mr-2 h-4 w-4" />
             Hotels
           </Button>
-          <Button
-            variant={activeSection === 'menus' ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={() => setActiveSection('menus')}
-          >
-            <Menu className="mr-2 h-4 w-4" />
-            Menus
-          </Button>
         </nav>
       </aside>
 
@@ -42,21 +36,14 @@ export function AdminDashboard() {
         {activeSection === 'users' && (
           <div>
             <h2 className="mb-6 text-2xl font-bold">User Management</h2>
-            {/* User management content */}
+            <UserList />
           </div>
         )}
         
         {activeSection === 'hotels' && (
           <div>
             <h2 className="mb-6 text-2xl font-bold">Hotel Management</h2>
-            {/* Hotel management content */}
-          </div>
-        )}
-        
-        {activeSection === 'menus' && (
-          <div>
-            <h2 className="mb-6 text-2xl font-bold">Menu Management</h2>
-            {/* Menu management content */}
+            <HotelList />
           </div>
         )}
       </main>
