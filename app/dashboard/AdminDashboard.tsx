@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, Store } from 'lucide-react';
+import { Users, Store, Tag } from 'lucide-react';
 import { UserList } from '@/components/admin/UserList';
 import { HotelList } from '@/components/admin/HotelList';
+import { OfferList } from '@/components/admin/OfferList';
 
 export function AdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'users' | 'hotels'>('users');
+  const [activeSection, setActiveSection] = useState<'users' | 'hotels' | 'offers'>('users');
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
@@ -29,6 +30,14 @@ export function AdminDashboard() {
             <Store className="mr-2 h-4 w-4" />
             Hotels
           </Button>
+          <Button
+            variant={activeSection === 'offers' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            onClick={() => setActiveSection('offers')}
+          >
+            <Tag className="mr-2 h-4 w-4" />
+            Offers
+          </Button>
         </nav>
       </aside>
 
@@ -44,6 +53,13 @@ export function AdminDashboard() {
           <div>
             <h2 className="mb-6 text-2xl font-bold">Hotel Management</h2>
             <HotelList />
+          </div>
+        )}
+
+        {activeSection === 'offers' && (
+          <div>
+            <h2 className="mb-6 text-2xl font-bold">Offer Management</h2>
+            <OfferList />
           </div>
         )}
       </main>

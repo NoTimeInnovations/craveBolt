@@ -32,7 +32,8 @@ export function AddOfferForm() {
   const [formData, setFormData] = useState({
     itemId: '',
     discountPrice: '',
-    validHours: '1',
+    validTill: '',
+    description: '',
   });
 
   useEffect(() => {
@@ -74,13 +75,15 @@ export function AddOfferForm() {
 
     try {
       setLoading(true);
-      const validTill = new Date();
-      validTill.setHours(validTill.getHours() + parseInt(formData.validHours));
+      const validTill = new Date(formData.validTill);
 
       await addDoc(collection(db, 'offers'), {
         hotelId: user.uid,
+        hotelName: user.displayName || '',
+        hotelPhone: user.phoneNumber,
         menuItemId: formData.itemId,
         name: selectedItem.name,
+        description: formData.description,
         originalPrice: selectedItem.price,
         price: parseFloat(formData.discountPrice),
         imageUrl: selectedItem.imageUrl,
@@ -92,7 +95,8 @@ export function AddOfferForm() {
       setFormData({
         itemId: '',
         discountPrice: '',
-        validHours: '1',
+        validTill: '',
+        description: '',
       });
       setSelectedItem(null);
     } catch (error) {
@@ -153,17 +157,26 @@ export function AddOfferForm() {
               </div>
 
               <div>
-                <Label htmlFor="validHours">Valid for (hours)</Label>
+                <Label htmlFor="validTill">Valid Till</Label>
                 <Input
-                  id="validHours"
-                  type="number"
-                  min="1"
-                  max="24"
-                  value={formData.validHours}
+                  id="validTill"
+                  type="datetime-local"
+                  value={formData.validTill}
                   onChange={(e) =>
-                    setFormData({ ...formData, validHours: e.target.value })
+                    setFormData({ ...formData, validTill: e.target.value })
                   }
                   required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Input
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                 />
               </div>
             </>
