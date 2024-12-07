@@ -22,9 +22,11 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { Plus } from 'lucide-react';
+import { useMenuStore } from '@/lib/store';
 
 export function AddMenuItemForm() {
   const { user } = useAuth();
+  const addMenuItem = useMenuStore((state) => state.addMenuItem);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +43,18 @@ export function AddMenuItemForm() {
 
     try {
       setLoading(true);
-      await addDoc(collection(db, 'menuItems'), {
+      const docRef = await addDoc(collection(db, 'menuItems'), {
+        hotelId: user.uid,
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        imageUrl: formData.imageUrl,
+        available: true,
+      });
+
+      addMenuItem({
+        id: docRef.id,
         hotelId: user.uid,
         name: formData.name,
         description: formData.description,
