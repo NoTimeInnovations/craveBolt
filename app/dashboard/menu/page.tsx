@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { MenuItem } from '@/lib/types';
 import { DashboardHeader } from '@/components/layout/DashboardHeader';
+import { AddMenuItemForm } from '@/components/hotel/AddMenuItemForm';
+import { MenuItemCard } from '@/components/hotel/MenuItemCard';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function MenuPage() {
   const { user } = useAuth();
@@ -37,37 +40,40 @@ export default function MenuPage() {
     fetchMenuItems();
   }, [user]);
 
-  if (loading) return <div>Loading menu items...</div>;
+  const handleDeleteItem = async (itemId: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    try {
+      await deleteDoc(doc(db, 'menuItems', itemId));
+      setMenuItems(menuItems.filter(item => item.id !== itemId));
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <DashboardHeader />
       <div className="container mx-auto p-6">
-        <h2 className="mb-6 text-2xl font-bold">Your Menu Items</h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Your Menu Items</h2>
+          <AddMenuItemForm />
+        </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {menuItems.map((item) => (
-            <div
+            <MenuItemCard
               key={item.id}
-              className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm"
-            >
-              <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-md">
-                <img
-                  src={item.imageUrl}
-                  alt={item.name}
-                  className="object-cover"
-                />
-              </div>
-              <h3 className="text-lg font-semibold">{item.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {item.description}
-              </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-2xl font-bold">₹{item.price}</span>
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
-                  {item.category === 'veg' ? 'Vegetarian' : 'Non-Vegetarian'}
-                </span>
-              </div>
-            </div>
+              item={item}
+              onDelete={handleDeleteItem}
+            />
           ))}
         </div>
       </div>
