@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +12,7 @@ import { useMenuStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { MenuItem } from '@/lib/types';
 
 export default function MenuPage() {
   const { user } = useAuth();
